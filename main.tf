@@ -40,15 +40,23 @@ module "blog_alb" {
   subnets            = module.blog_vpc.public_subnets
   security_groups    = [module.blog_sg.security_group_id]
 
-  target_groups = {
-    ex-instance = {
-      name_prefix      = "blog"
-      protocol = "HTTP"
-      port     = 80
+  target_groups = [
+    {
+      name_prefix      = "alb-blog-tg"
+      backend_protocol = "HTTP"
+      port             = 80
       target_type      = "instance"
-      target_id = aws_instance.blog.id
-    }
-  }
+      vpc_id           = module.blog_vpc.vpc_id
+      instance_ids     = [aws_instance.blog.id]
+      health_check = {
+        path                = "/"
+        interval            = 30
+        timeout             = 5
+        healthy_threshold   = 2
+        unhealthy_threshold = 2
+      }
+    },
+  ]
 
   listeners = {
     ex-http-https-redirect = {
@@ -63,6 +71,7 @@ module "blog_alb" {
   }
 
   tags = {
+    Environment = "Dev"
     Terraform = "true"
   }
 }
@@ -76,11 +85,7 @@ module "blog_asg" {
   max_size                  = 2
   health_check_type         = "ELB"
   vpc_zone_identifier       = module.blog_vpc.public_subnets
-
-  target_groups             = {
-    target_group_arn =  module.blog_alb.target_group_arns[0]
-    weight          = 1
-  }
+  target_group_arns         = [module.blog_alb.target_group_arns[0]]
 
   tags = {
     Terraform = "true"
