@@ -31,6 +31,7 @@ module "blog_vpc" {
 
 module "blog_alb" {
   source  = "terraform-aws-modules/alb/aws"
+  version = "8.2.1"
 
   name = "blog-alb"
 
