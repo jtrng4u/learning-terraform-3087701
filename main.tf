@@ -59,17 +59,13 @@ module "blog_alb" {
     },
   ]
 
-  listeners = {
-    ex-http-https-redirect = {
+  listener = [
+    {
       port     = 80
       protocol = "HTTP"
-      redirect = {
-        port        = "443"
-        protocol    = "HTTPS"
-        status_code = "HTTP_301"
-      }
+      target_group_index = 0
     }
-  }
+  ]
 
   tags = {
     Environment = "Dev"
