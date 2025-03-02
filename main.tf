@@ -79,24 +79,36 @@ module "blog_alb" {
 
 module "blog_asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
-  version = "8.1.0"
 
-  name                      = "blog-asg"
+  # Autoscaling group
+  name = "blog-asg"
+
   min_size                  = 1
   max_size                  = 2
-  health_check_type         = "ELB"
+  desired_capacity          = 1
+  wait_for_capacity_timeout = 0
+  health_check_type         = "EC2"
   vpc_zone_identifier       = module.blog_vpc.public_subnets
-  # Associating the target group with ASG using the `target_groups` argument
-  target_groups = [
-    {
-      target_group_arn = module.blog_alb.target_group_arns[0]
-      # Additional settings like health checks can be added here
-      health_check_type = "EC2"
-    }
-  ]
+
+  # Launch template
+  launch_template_name        = "example-asg"
+  launch_template_description = "Launch template example"
+  update_default_version      = true
+
+  image_id          = data.aws_ami.app_ami.id
+
+  # This will ensure imdsv2 is enabled, required, and a single hop which is aws security
+  # best practices
+  # See https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-4
+  metadata_options = {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
 
   tags = {
-    Terraform = "true"
+    Environment = "dev"
+    Project     = "megasecret"
   }
 }
 
