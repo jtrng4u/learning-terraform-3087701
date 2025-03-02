@@ -30,7 +30,7 @@ resource "aws_instance" "blog" {
 
 resource "aws_security_group" "blog" {
   name = "blog"
-  vpc_id = aws_vpc.default.id
+  vpc_id = data.aws_vpc.default.id
   tags = {
     name = "blog"
   }
@@ -39,9 +39,9 @@ resource "aws_security_group" "blog" {
 resource "aws_security_group_rule" "blog_http_in" {
 
   type = "ingress"
-  protocol = "http"
   to_port = "8080"
   from_port = "8080"
+  protocol = "http"
   cidr_blocks = [
     "0.0.0.0/0"
   ]
@@ -50,20 +50,20 @@ resource "aws_security_group_rule" "blog_http_in" {
 
 resource "aws_security_group_rule" "blog_https_in" {
   type      = "ingress"
-  protocol  = "https"
   from_port = "443"
   to_port   = "443"
+  protocol  = "https"
   cidr_blocks = [
     "0.0.0.0/0"
   ]
   security_group_id = aws_security_group.blog.id
 }
 
-resource "aws_security_group" "blog_anything_out" {
+resource "aws_security_group" "blog_everything_out" {
   type      = "egress"
-  protocol  = "-1"
   from_port = 0
   to_port   = 0
+  protocol  = "-1"
   cidr_blocks = [
     "0.0.0.0/0"
   ]
