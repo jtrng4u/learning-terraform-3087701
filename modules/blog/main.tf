@@ -11,7 +11,7 @@ data "aws_ami" "app_ami" {
     values = ["hvm"]
   }
 
-  owners = [var.ami_filter.owner] # Bitnami
+  owners = [var.ami_filter.owner]
 }
 
 
@@ -36,7 +36,7 @@ module "blog_autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "6.5.2"
 
-  name = "blog"
+  name = "${var.environment.network_prefix}-blog"
 
   min_size            = var.asg_min_size
   max_size            = var.asg_max_size
@@ -51,7 +51,7 @@ module "blog_alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 6.0"
 
-  name = "blog-alb"
+  name = "${var.environment.network_prefix}-blog-alb"
 
   load_balancer_type = "application"
 
