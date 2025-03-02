@@ -86,7 +86,14 @@ module "blog_asg" {
   max_size                  = 2
   health_check_type         = "ELB"
   vpc_zone_identifier       = module.blog_vpc.public_subnets
-  target_group_arns         = [module.blog_alb.target_group_arns[0]]
+  # Associating the target group with ASG using the `target_groups` argument
+  target_groups = [
+    {
+      target_group_arn = module.blog_alb.target_group_arns[0]
+      # Additional settings like health checks can be added here
+      health_check_type = "EC2"
+    }
+  ]
 
   tags = {
     Terraform = "true"
