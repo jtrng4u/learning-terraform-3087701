@@ -31,7 +31,7 @@ module "blog_vpc" {
 
 module "blog_alb" {
   source  = "terraform-aws-modules/alb/aws"
-  version = "8.2.1"
+  version = "9.13.0"
 
   name = "blog-alb"
 
@@ -59,13 +59,17 @@ module "blog_alb" {
     },
   ]
 
-  listener = [
-    {
+  listeners = {
+    ex-http-https-redirect = {
       port     = 80
       protocol = "HTTP"
-      target_group_index = 0
+      redirect = {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
     }
-  ]
+  }
 
   tags = {
     Environment = "Dev"
@@ -75,9 +79,9 @@ module "blog_alb" {
 
 module "blog_asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
+  version = "8.1.0"
 
-  name = "blog-asg"
-
+  name                      = "blog-asg"
   min_size                  = 1
   max_size                  = 2
   health_check_type         = "ELB"
