@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "blog_http_in" {
   type = "ingress"
   to_port = "8080"
   from_port = "8080"
-  protocol = "http"
+  protocol = "tcp"
   cidr_blocks = [
     "0.0.0.0/0"
   ]
@@ -52,7 +52,7 @@ resource "aws_security_group_rule" "blog_https_in" {
   type      = "ingress"
   from_port = "443"
   to_port   = "443"
-  protocol  = "https"
+  protocol  = "tcp"
   cidr_blocks = [
     "0.0.0.0/0"
   ]
